@@ -2,9 +2,11 @@ import axios from 'axios'
 import { LogFile, Anomaly, CopilotMessage } from '../types'
 
 // Use environment variable for API URL in production, fallback to local for development
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'https://hackathon-logsentinel.onrender.com/api')
 
 // Debug logging to verify environment variable
+console.log('Environment mode:', import.meta.env.MODE)
+console.log('Environment DEV:', import.meta.env.DEV)
 console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL)
 console.log('Final API Base URL:', API_BASE)
 

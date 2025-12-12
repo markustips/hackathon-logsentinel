@@ -10,15 +10,17 @@ const ConnectionTest: React.FC = () => {
   }>({
     backend: 'loading',
     database: 'loading',
-    apiUrl: import.meta.env.VITE_API_URL || '/api'
+    apiUrl: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'https://hackathon-logsentinel.onrender.com/api')
   })
 
   useEffect(() => {
     const testConnections = async () => {
-      const apiBase = import.meta.env.VITE_API_URL || '/api'
+      const apiBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'https://hackathon-logsentinel.onrender.com/api')
       
+      console.log('Environment mode:', import.meta.env.MODE)
+      console.log('Environment DEV:', import.meta.env.DEV)
       console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL)
-      console.log('Testing with API base:', apiBase)
+      console.log('Final API base:', apiBase)
       
       try {
         // Test backend connection
