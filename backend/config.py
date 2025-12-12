@@ -10,8 +10,8 @@ class Settings(BaseSettings):
 
     # LLM Configuration (supports both Anthropic and Google Gemini)
     llm_provider: str = "gemini"  # "anthropic" or "gemini"
-    anthropic_api_key: str = ""
-    google_api_key: str = ""
+    anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
+    google_api_key: str = os.getenv("GOOGLE_API_KEY", "")
     gemini_model: str = "gemini-2.0-flash-exp"  # Latest Gemini 2.0 Flash model
 
     # Database - Support both SQLite (development) and PostgreSQL (production)
@@ -24,14 +24,14 @@ class Settings(BaseSettings):
     embedding_model: str = "all-MiniLM-L6-v2"
 
     # Logging
-    log_level: str = "INFO"
+    log_level: str = os.getenv("LOG_LEVEL", "INFO")
 
     # Chunking
     chunk_window_minutes: int = 5
 
     # API
     api_host: str = "0.0.0.0"
-    api_port: int = 8000
+    api_port: int = int(os.getenv("PORT", "8000"))
 
     class Config:
         env_file = ".env"

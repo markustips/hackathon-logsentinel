@@ -27,10 +27,7 @@ services:
     buildFilter:
       paths:
         - backend/**
-    routes:
-      - type: rewrite
-        source: /api/*
-        destination: /*
+    autoDeploy: true
 
   # Frontend Static Site
   - type: web
@@ -48,10 +45,7 @@ services:
     buildFilter:
       paths:
         - frontend/**
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    autoDeploy: true
 
 # PostgreSQL Database
 databases:
