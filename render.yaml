@@ -29,23 +29,12 @@ services:
         - backend/**
     autoDeploy: true
 
-  # Frontend Static Site
-  - type: web
-    name: logsentinel-frontend
-    runtime: static
-    repo: https://github.com/markustips/hackathon-logsentinel.git
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    plan: free
-    region: oregon
-    envVars:
-      - key: VITE_API_URL
-        value: https://logsentinel-backend.onrender.com/api
-    buildFilter:
-      paths:
-        - frontend/**
-    autoDeploy: true
+# Note: For frontend deployment, create a Static Site manually in Render dashboard
+# with these settings:
+# - Type: Static Site
+# - Build Command: npm install && npm run build  
+# - Publish Directory: dist
+# - Environment Variable: VITE_API_URL=https://logsentinel-backend.onrender.com/api
 
 # PostgreSQL Database
 databases:

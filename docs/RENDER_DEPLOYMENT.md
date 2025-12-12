@@ -42,14 +42,15 @@
 1. **Create Static Site on Render:**
    - Connect to same GitHub repository
    - Root directory: `frontend`
-   - Environment: `Node`
    - Build command: `npm install && npm run build`
-   - Publish directory: `dist`
+   - **Publish directory: `dist`** (Important: NOT `build`)
 
 2. **Environment Variables:**
-   ```
+   ```env
    VITE_API_URL=https://your-backend-service.onrender.com/api
    ```
+
+⚠️ **Important**: Make sure to set **Publish Directory** to `dist` in the Render dashboard, as Vite builds to `dist` folder by default.
 
 ### Database Setup
 
