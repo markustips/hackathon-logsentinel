@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     google_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash-exp"  # Latest Gemini 2.0 Flash model
 
-    # Database
+    # Database - Support both SQLite (development) and PostgreSQL (production)
     database_url: str = "sqlite:///./logsentinel.db"
 
     # FAISS Index

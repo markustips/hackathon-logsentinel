@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
+# Copy requirements from root directory
 COPY requirements.txt .
 
 # Install Python dependencies
@@ -20,8 +20,8 @@ COPY . .
 # Create data directories
 RUN mkdir -p /app/data/faiss_index /app/data/uploads
 
-# Expose port
-EXPOSE 8000
+# Expose port (Render will set PORT environment variable)
+EXPOSE $PORT
 
-# Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application with dynamic port
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
