@@ -100,7 +100,6 @@ export default function Dashboard({ fileId }: DashboardProps) {
   if (!fileId) {
     return (
       <div className="h-full flex flex-col p-6">
-        <ConnectionTest />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center text-gray-400">
             <Activity className="w-16 h-16 mx-auto mb-4 opacity-50" />

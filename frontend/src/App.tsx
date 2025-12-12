@@ -4,6 +4,7 @@ import FileExplorer from './components/FileExplorer'
 import Dashboard from './components/Dashboard'
 import CopilotChat from './components/CopilotChat'
 import AgentProgressTracker from './components/AgentProgressTracker'
+import ConnectionStatus from './components/ConnectionStatus'
 import { AgentProgress } from './types'
 
 function App() {
@@ -26,11 +27,7 @@ function App() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-green-400">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <span className="text-sm font-medium">System Online</span>
-            </div>
-            
+            <ConnectionStatus />
           </div>
         </div>
       </header>
