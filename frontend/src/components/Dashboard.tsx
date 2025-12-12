@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Activity, AlertTriangle, Shield, TrendingUp, ChevronRight } from 'lucide-react'
+import { Activity, AlertTriangle, Shield, TrendingUp, ChevronRight, Search, X } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { useApi } from '../hooks/useApi'
 import { LogFile, Anomaly } from '../types'
@@ -14,11 +14,18 @@ export default function Dashboard({ fileId }: DashboardProps) {
   const [loading, setLoading] = useState(false)
   const [selectedAnomaly, setSelectedAnomaly] = useState<string | null>(null)
   const [showAllAnomalies, setShowAllAnomalies] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searching, setSearching] = useState(false)
+  const [showSearchResults, setShowSearchResults] = useState(false)
   const api = useApi()
 
   useEffect(() => {
     if (fileId) {
       loadData()
+      setSearchQuery('')
+      setSearchResults([])
+      setShowSearchResults(false)
     }
   }, [fileId])
 
@@ -38,6 +45,34 @@ export default function Dashboard({ fileId }: DashboardProps) {
       console.error('Error loading data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSearch = async () => {
+    if (!fileId || !searchQuery.trim()) return
+
+    setSearching(true)
+    setShowSearchResults(true)
+    try {
+      const results = await api.searchLogs(fileId, searchQuery, 20)
+      setSearchResults(results.results || [])
+    } catch (error) {
+      console.error('Search error:', error)
+      setSearchResults([])
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  const clearSearch = () => {
+    setSearchQuery('')
+    setSearchResults([])
+    setShowSearchResults(false)
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch()
     }
   }
 
@@ -132,6 +167,119 @@ export default function Dashboard({ fileId }: DashboardProps) {
   return (
     <div className="h-full overflow-hidden bg-gray-900">
       <div className="h-full overflow-y-auto p-6 space-y-6">
+
+      {/* Search Bar */}
+      <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search logs using semantic search (e.g., 'authentication failures', 'suspicious activity')..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="w-full pl-10 pr-10 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            {searchQuery && (
+              <button
+                onClick={clearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={handleSearch}
+            disabled={!searchQuery.trim() || searching}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          >
+            {searching ? (
+              <>
+                <Activity className="w-5 h-5 animate-spin" />
+                Searching...
+              </>
+            ) : (
+              <>
+                <Search className="w-5 h-5" />
+                Search
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Search Results */}
+        {showSearchResults && (
+          <div className="mt-4 pt-4 border-t border-gray-700">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-white">
+                Search Results {searchResults.length > 0 && `(${searchResults.length})`}
+              </h3>
+              {searchResults.length > 0 && (
+                <button
+                  onClick={clearSearch}
+                  className="text-sm text-gray-400 hover:text-white"
+                >
+                  Clear Results
+                </button>
+              )}
+            </div>
+
+            {searching ? (
+              <div className="text-center py-8">
+                <Activity className="w-8 h-8 mx-auto mb-2 animate-spin text-blue-400" />
+                <p className="text-gray-400">Searching logs...</p>
+              </div>
+            ) : searchResults.length > 0 ? (
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {searchResults.map((result, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gray-700/50 border border-gray-600 rounded-lg p-4 hover:border-blue-500 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono bg-gray-600 px-2 py-1 rounded text-gray-300">
+                          Score: {(result.score * 100).toFixed(1)}%
+                        </span>
+                        {result.log_level && (
+                          <span className={`text-xs font-medium px-2 py-1 rounded ${
+                            result.log_level === 'ERROR' ? 'bg-red-900 text-red-200' :
+                            result.log_level === 'WARN' ? 'bg-yellow-900 text-yellow-200' :
+                            'bg-blue-900 text-blue-200'
+                          }`}>
+                            {result.log_level}
+                          </span>
+                        )}
+                      </div>
+                      {result.timestamp && (
+                        <span className="text-xs text-gray-400">
+                          {new Date(result.timestamp).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-200 font-mono leading-relaxed">
+                      {result.message || result.raw_text}
+                    </p>
+                    {result.source && (
+                      <p className="text-xs text-gray-400 mt-2">
+                        Source: {result.source}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Search className="w-12 h-12 mx-auto mb-2 text-gray-600" />
+                <p className="text-gray-400">No results found for "{searchQuery}"</p>
+                <p className="text-sm text-gray-500 mt-1">Try different keywords or phrases</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Metrics Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
