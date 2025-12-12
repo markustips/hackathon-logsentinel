@@ -2,9 +2,11 @@ import axios from 'axios'
 import { LogFile, Anomaly, CopilotMessage } from '../types'
 
 // Use environment variable for API URL in production, fallback to local for development
-const API_BASE = (import.meta as any).env?.VITE_API_URL || '/api'
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
-console.log('API Base URL:', API_BASE) // Debug log to verify correct URL
+// Debug logging to verify environment variable
+console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL)
+console.log('Final API Base URL:', API_BASE)
 
 export const useApi = () => {
   // Upload file

@@ -34,7 +34,7 @@ services:
 # - Type: Static Site
 # - Build Command: npm install && npm run build  
 # - Publish Directory: dist
-# - Environment Variable: VITE_API_URL=https://logsentinel-backend.onrender.com/api
+# - Environment Variable: VITE_API_URL=https://hackathon-logsentinel.onrender.com/api
 
 # PostgreSQL Database
 databases:
