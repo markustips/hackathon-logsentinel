@@ -37,10 +37,25 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database on startup."""
+    """Initialize database and directories on startup."""
+    import os
     logger.info("Starting LogSentinel AI...")
-    create_db_and_tables()
-    logger.info("Database initialized")
+    
+    # Create required directories
+    try:
+        os.makedirs("./data/uploads", exist_ok=True)
+        os.makedirs("./data/faiss_index", exist_ok=True)
+        logger.info("Data directories created successfully")
+    except Exception as e:
+        logger.warning(f"Failed to create data directories: {e}")
+    
+    # Initialize database
+    try:
+        create_db_and_tables()
+        logger.info("Database initialized")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        raise
 
 
 @app.get("/health")

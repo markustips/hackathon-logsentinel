@@ -18,7 +18,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create data directories
-RUN mkdir -p /app/data/faiss_index /app/data/uploads
+RUN mkdir -p /app/data/faiss_index /app/data/uploads && \
+    chmod 755 /app/data && \
+    chmod 755 /app/data/faiss_index && \
+    chmod 755 /app/data/uploads
+
+# Set environment variable for data directory
+ENV DATA_DIR=/app/data
 
 # Expose port (Render will set PORT environment variable)
 EXPOSE $PORT

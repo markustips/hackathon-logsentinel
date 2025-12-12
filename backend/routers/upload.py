@@ -2,6 +2,7 @@
 import os
 import json
 import shutil
+import tempfile
 from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
@@ -19,9 +20,26 @@ settings = get_settings()
 
 router = APIRouter()
 
-# Create upload directory
+# Create upload directory with better error handling
 UPLOAD_DIR = "./data/uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+FAISS_DIR = "./data/faiss_index"
+
+def ensure_directories():
+    """Ensure all required directories exist."""
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        os.makedirs(FAISS_DIR, exist_ok=True)
+        logger.info(f"Created directories: {UPLOAD_DIR}, {FAISS_DIR}")
+    except Exception as e:
+        logger.error(f"Failed to create directories: {e}")
+        # Fallback to temp directory
+        global UPLOAD_DIR, FAISS_DIR
+        UPLOAD_DIR = tempfile.mkdtemp(prefix="logsentinel_uploads_")
+        FAISS_DIR = tempfile.mkdtemp(prefix="logsentinel_faiss_")
+        logger.warning(f"Using temporary directories: {UPLOAD_DIR}, {FAISS_DIR}")
+
+# Ensure directories exist on startup
+ensure_directories()
 
 
 @router.post("/upload", response_model=FileUploadResponse)
@@ -50,10 +68,27 @@ async def upload_log_file(
         session.commit()
         session.refresh(log_file)
 
-        # Save uploaded file
+        # Save uploaded file with better error handling
         file_path = os.path.join(UPLOAD_DIR, f"{log_file.id}_{file.filename}")
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        try:
+            # Ensure the upload directory exists
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            
+            # Verify file was saved
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(f"Failed to save file to {file_path}")
+            
+            logger.info(f"File saved successfully: {file_path}")
+        except Exception as e:
+            logger.error(f"Failed to save file: {e}")
+            log_file.status = "failed"
+            log_file.error_message = f"File save error: {str(e)}"
+            session.add(log_file)
+            session.commit()
+            raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
 
         # Get file size
         log_file.file_size = os.path.getsize(file_path)
@@ -63,7 +98,16 @@ async def upload_log_file(
         # Parse file
         logger.info(f"Parsing file: {file.filename}")
         parser = LogParser()
-        records = parser.parse_file(file_path)
+        
+        try:
+            records = parser.parse_file(file_path)
+        except Exception as e:
+            logger.error(f"Failed to parse file: {e}")
+            log_file.status = "failed"
+            log_file.error_message = f"Parse error: {str(e)}"
+            session.add(log_file)
+            session.commit()
+            raise HTTPException(status_code=400, detail=f"Failed to parse file: {str(e)}")
 
         if not records:
             log_file.status = "failed"
@@ -72,11 +116,21 @@ async def upload_log_file(
             session.commit()
             raise HTTPException(status_code=400, detail="No records found in file")
 
-        # Create indexer
-        indexer = LogIndexer(
-            embedding_model_name=settings.embedding_model,
-            index_path=settings.faiss_index_path
-        )
+        # Create indexer with directory validation
+        try:
+            os.makedirs(settings.faiss_index_path, exist_ok=True)
+            indexer = LogIndexer(
+                embedding_model_name=settings.embedding_model,
+                index_path=settings.faiss_index_path
+            )
+        except Exception as e:
+            logger.error(f"Failed to create indexer: {e}")
+            # Use temporary directory as fallback
+            temp_index_path = tempfile.mkdtemp(prefix="logsentinel_index_")
+            indexer = LogIndexer(
+                embedding_model_name=settings.embedding_model,
+                index_path=temp_index_path
+            )
 
         # Create chunks
         chunks = indexer.create_chunks(records, settings.chunk_window_minutes)
