@@ -35,8 +35,12 @@ async def chat_with_copilot(
     if not log_file:
         raise HTTPException(status_code=404, detail="File not found")
 
-    if log_file.status != "indexed":
-        raise HTTPException(status_code=400, detail="File not indexed yet")
+    if log_file.status == "processing":
+        raise HTTPException(status_code=400, detail="File is still being processed. Please wait for indexing to complete.")
+    elif log_file.status == "failed":
+        raise HTTPException(status_code=400, detail="File processing failed. Please upload the file again.")
+    elif log_file.status != "indexed":
+        raise HTTPException(status_code=400, detail=f"File status is '{log_file.status}'. Expected 'indexed'.")
 
     # Run copilot
     logger.info(f"Processing copilot query: {request.message[:100]}")
@@ -92,8 +96,12 @@ async def chat_with_copilot_stream(
     if not log_file:
         raise HTTPException(status_code=404, detail="File not found")
 
-    if log_file.status != "indexed":
-        raise HTTPException(status_code=400, detail="File not indexed yet")
+    if log_file.status == "processing":
+        raise HTTPException(status_code=400, detail="File is still being processed. Please wait for indexing to complete.")
+    elif log_file.status == "failed":
+        raise HTTPException(status_code=400, detail="File processing failed. Please upload the file again.")
+    elif log_file.status != "indexed":
+        raise HTTPException(status_code=400, detail=f"File status is '{log_file.status}'. Expected 'indexed'.")
 
     logger.info(f"Processing streaming copilot query: {request.message[:100]}")
 
