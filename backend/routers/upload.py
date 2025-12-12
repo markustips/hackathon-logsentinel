@@ -20,6 +20,38 @@ settings = get_settings()
 
 router = APIRouter()
 
+
+@router.get("/files/{file_id}/retry")
+async def retry_file_processing(
+    file_id: str,
+    session: Session = Depends(get_session)
+):
+    """
+    Retry processing a file that failed or is stuck in processing.
+    
+    Args:
+        file_id: File ID to retry
+        session: Database session
+    
+    Returns:
+        FileUploadResponse with updated status
+    """
+    log_file = session.get(LogFile, file_id)
+    if not log_file:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    if log_file.status == "indexed":
+        return {"message": "File is already indexed", "status": "indexed"}
+    
+    # Reset status and try again
+    log_file.status = "processing"
+    log_file.error_message = None
+    session.add(log_file)
+    session.commit()
+    
+    return {"message": "Processing retry initiated", "status": "processing"}
+
+
 # Global variables for directory paths
 UPLOAD_DIR = "./data/uploads"
 FAISS_DIR = "./data/faiss_index"
@@ -148,7 +180,15 @@ async def upload_log_file(
         # Process records and create embeddings
         logger.info(f"Creating embeddings for {len(records)} records")
         messages = [r.get('message', '') for r in records]
-        embeddings = indexer.create_embeddings(messages)
+        
+        try:
+            embeddings = indexer.create_embeddings(messages)
+            logger.info(f"Successfully created {len(embeddings)} embeddings")
+        except Exception as e:
+            logger.error(f"Failed to create embeddings: {e}", exc_info=True)
+            # Continue without embeddings - file can still be indexed
+            logger.warning("Continuing without embeddings - search functionality will be limited")
+            embeddings = [None] * len(messages)
 
         # Save records to database
         db_records = []
@@ -169,7 +209,7 @@ async def upload_log_file(
                 source=record.get('source'),
                 message=record.get('message', ''),
                 raw_text=record.get('raw_text', ''),
-                embedding_vector=json.dumps(embeddings[idx].tolist()) if idx < len(embeddings) else None,
+                embedding_vector=json.dumps(embeddings[idx].tolist()) if embeddings[idx] is not None and idx < len(embeddings) else None,
                 extra_data=record.get('extra_data', {})
             )
             db_records.append(db_record)
@@ -183,13 +223,23 @@ async def upload_log_file(
 
         # Build FAISS index
         logger.info("Building FAISS index")
-        indexer.build_index(log_file.id, [
-            {
-                'id': r.id,
-                'embedding_vector': r.embedding_vector
-            }
-            for r in db_records if r.embedding_vector
-        ])
+        try:
+            valid_records = [
+                {
+                    'id': r.id,
+                    'embedding_vector': r.embedding_vector
+                }
+                for r in db_records if r.embedding_vector
+            ]
+            
+            if valid_records:
+                indexer.build_index(log_file.id, valid_records)
+                logger.info(f"FAISS index built successfully with {len(valid_records)} vectors")
+            else:
+                logger.warning("No valid embeddings to build FAISS index")
+        except Exception as e:
+            logger.error(f"Failed to build FAISS index: {e}", exc_info=True)
+            logger.warning("Continuing without FAISS index - semantic search will not be available")
 
         # Update file status
         log_file.status = "indexed"
