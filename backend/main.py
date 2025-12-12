@@ -26,8 +26,9 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173", 
         "http://localhost:3000",
-        "https://logsentinel-frontend.onrender.com",  # Add your actual frontend URL here
-        "https://*.onrender.com"  # Allow all Render subdomains
+        "https://hackathon-logsentinel-frontend.onrender.com",  # Your frontend domain
+        "https://logsentinel-frontend.onrender.com",
+        "*"  # Allow all origins for now - can restrict later
     ],
     allow_credentials=True,
     allow_methods=["*"],
