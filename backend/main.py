@@ -41,21 +41,22 @@ async def startup_event():
     import os
     logger.info("Starting LogSentinel AI...")
     
-    # Create required directories
+    # Create required directories (non-blocking)
     try:
         os.makedirs("./data/uploads", exist_ok=True)
         os.makedirs("./data/faiss_index", exist_ok=True)
         logger.info("Data directories created successfully")
     except Exception as e:
-        logger.warning(f"Failed to create data directories: {e}")
+        logger.warning(f"Failed to create data directories (will use fallback): {e}")
     
     # Initialize database
     try:
         create_db_and_tables()
-        logger.info("Database initialized")
+        logger.info("Database initialized successfully")
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
-        raise
+        # Don't raise the exception to prevent startup failure
+        logger.error("Continuing startup without database - some features may not work")
 
 
 @app.get("/health")

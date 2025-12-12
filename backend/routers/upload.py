@@ -20,26 +20,36 @@ settings = get_settings()
 
 router = APIRouter()
 
-# Create upload directory with better error handling
+# Global variables for directory paths
 UPLOAD_DIR = "./data/uploads"
 FAISS_DIR = "./data/faiss_index"
 
 def ensure_directories():
     """Ensure all required directories exist."""
+    global UPLOAD_DIR, FAISS_DIR
+    
     try:
         os.makedirs(UPLOAD_DIR, exist_ok=True)
         os.makedirs(FAISS_DIR, exist_ok=True)
         logger.info(f"Created directories: {UPLOAD_DIR}, {FAISS_DIR}")
+        return True
     except Exception as e:
         logger.error(f"Failed to create directories: {e}")
         # Fallback to temp directory
-        global UPLOAD_DIR, FAISS_DIR
-        UPLOAD_DIR = tempfile.mkdtemp(prefix="logsentinel_uploads_")
-        FAISS_DIR = tempfile.mkdtemp(prefix="logsentinel_faiss_")
-        logger.warning(f"Using temporary directories: {UPLOAD_DIR}, {FAISS_DIR}")
+        try:
+            UPLOAD_DIR = tempfile.mkdtemp(prefix="logsentinel_uploads_")
+            FAISS_DIR = tempfile.mkdtemp(prefix="logsentinel_faiss_")
+            logger.warning(f"Using temporary directories: {UPLOAD_DIR}, {FAISS_DIR}")
+            return True
+        except Exception as temp_error:
+            logger.error(f"Failed to create temporary directories: {temp_error}")
+            return False
 
-# Ensure directories exist on startup
-ensure_directories()
+# Try to ensure directories exist on startup, but don't fail if it doesn't work
+try:
+    ensure_directories()
+except Exception as e:
+    logger.warning(f"Directory initialization warning: {e}")
 
 
 @router.post("/upload", response_model=FileUploadResponse)
