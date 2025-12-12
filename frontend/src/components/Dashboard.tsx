@@ -3,6 +3,7 @@ import { Activity, AlertTriangle, Shield, TrendingUp, ChevronRight } from 'lucid
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { useApi } from '../hooks/useApi'
 import { LogFile, Anomaly } from '../types'
+import ConnectionTest from './ConnectionTest'
 
 interface DashboardProps {
   fileId: string | null
@@ -98,10 +99,13 @@ export default function Dashboard({ fileId }: DashboardProps) {
 
   if (!fileId) {
     return (
-      <div className="h-full flex items-center justify-center p-6">
-        <div className="text-center text-gray-400">
-          <Activity className="w-16 h-16 mx-auto mb-4 opacity-50" />
-          <p>Select a file to view dashboard</p>
+      <div className="h-full flex flex-col p-6">
+        <ConnectionTest />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-400">
+            <Activity className="w-16 h-16 mx-auto mb-4 opacity-50" />
+            <p>Select a file to view dashboard</p>
+          </div>
         </div>
       </div>
     )
