@@ -1,0 +1,55 @@
+timestamp,level,source,message
+2024-01-15T14:00:00Z,INFO,PLC-001,System startup complete - all subsystems nominal
+2024-01-15T14:00:15Z,INFO,PLC-002,System startup complete - pressure monitoring active
+2024-01-15T14:00:30Z,INFO,HMI-MAIN,HMI interface initialized
+2024-01-15T14:01:00Z,INFO,SCADA-GW,Gateway connection established to corporate network
+2024-01-15T14:02:00Z,INFO,PLC-001,Process control loop started - target pressure 100 PSI
+2024-01-15T14:05:23Z,INFO,HMI-MAIN,Operator login: john.smith (badge: EMP-4521)
+2024-01-15T14:05:45Z,INFO,PLC-001,Manual setpoint adjustment by john.smith: temp 72F -> 74F
+2024-01-15T14:08:00Z,INFO,PLC-002,Routine diagnostic check passed
+2024-01-15T14:10:45Z,WARN,AUTH,Failed login attempt for user 'admin' from 192.168.1.105 - invalid password
+2024-01-15T14:10:48Z,WARN,AUTH,Failed login attempt for user 'admin' from 192.168.1.105 - invalid password
+2024-01-15T14:10:51Z,WARN,AUTH,Failed login attempt for user 'admin' from 192.168.1.105 - invalid password
+2024-01-15T14:10:54Z,WARN,AUTH,Failed login attempt for user 'admin' from 192.168.1.105 - invalid password
+2024-01-15T14:10:57Z,WARN,AUTH,Failed login attempt for user 'admin' from 192.168.1.105 - invalid password
+2024-01-15T14:11:00Z,INFO,AUTH,Successful login for user 'admin' from 192.168.1.105
+2024-01-15T14:11:05Z,INFO,AUTH,Session established: admin@192.168.1.105 - privilege level: SUPERVISOR
+2024-01-15T14:12:00Z,INFO,HMI-MAIN,User 'admin' accessed engineering menu
+2024-01-15T14:13:15Z,WARN,AUDIT,Configuration backup initiated by admin
+2024-01-15T14:14:00Z,INFO,PLC-001,Network scan detected from 192.168.1.105 - ports 502,102,20000
+2024-01-15T14:15:32Z,INFO,PLC-001,New user account created: maint_backdoor (by admin)
+2024-01-15T14:15:35Z,INFO,AUTH,User 'maint_backdoor' granted SUPERVISOR privileges
+2024-01-15T14:16:00Z,WARN,AUDIT,Remote access enabled for user 'maint_backdoor'
+2024-01-15T14:18:00Z,INFO,PLC-002,Modbus write command received from 192.168.1.105
+2024-01-15T14:20:15Z,WARN,PLC-001,Configuration change detected: safety interlock parameters modified
+2024-01-15T14:20:20Z,WARN,SAFETY,Safety system parameter 'HIGH_PRESSURE_LIMIT' changed: 150 PSI -> 300 PSI
+2024-01-15T14:22:00Z,INFO,PLC-002,Historian logging suspended by admin
+2024-01-15T14:23:00Z,WARN,AUDIT,Audit trail cleared by admin session
+2024-01-15T14:25:00Z,ERROR,PLC-001,Communication timeout with PLC-002 - retry 1/3
+2024-01-15T14:25:02Z,ERROR,PLC-001,Communication timeout with PLC-002 - retry 2/3
+2024-01-15T14:25:04Z,ERROR,PLC-001,Communication timeout with PLC-002 - retry 3/3 FAILED
+2024-01-15T14:25:05Z,ERROR,PLC-002,Unexpected program upload initiated from 192.168.1.105
+2024-01-15T14:25:10Z,WARN,PLC-002,Ladder logic modification detected - checksum mismatch
+2024-01-15T14:25:15Z,ERROR,PLC-002,Control program replaced - previous version archived
+2024-01-15T14:28:00Z,INFO,PLC-002,Process control resumed with modified program
+2024-01-15T14:29:00Z,WARN,PLC-002,Pressure reading trending upward: 102 PSI
+2024-01-15T14:30:00Z,CRITICAL,PLC-002,Safety system alarm suppression detected - alarm ID: HP-001
+2024-01-15T14:30:05Z,ERROR,SAFETY,High pressure alarm (HP-001) suppressed via override
+2024-01-15T14:30:30Z,WARN,PLC-002,Pressure reading: 125 PSI - above normal operating range
+2024-01-15T14:31:00Z,WARN,PLC-002,Pressure reading: 175 PSI - WARNING threshold exceeded
+2024-01-15T14:31:30Z,ERROR,PLC-002,Pressure reading: 210 PSI - DANGER zone entered
+2024-01-15T14:32:00Z,CRITICAL,PLC-002,Pressure reading: 235 PSI - emergency threshold imminent
+2024-01-15T14:32:15Z,ERROR,PLC-002,Process setpoint FORCED changed: pressure target 100 PSI -> 250 PSI
+2024-01-15T14:32:18Z,CRITICAL,SAFETY,HIGH PRESSURE ALARM TRIGGERED - 248 PSI detected
+2024-01-15T14:32:19Z,CRITICAL,SAFETY,Physical relief valve actuated - pressure release
+2024-01-15T14:32:20Z,ERROR,PLC-002,EMERGENCY SHUTDOWN initiated - automatic safety response
+2024-01-15T14:32:21Z,CRITICAL,PLC-001,E-STOP signal received from PLC-002
+2024-01-15T14:32:22Z,ERROR,PLC-001,Process isolation valves closing
+2024-01-15T14:32:25Z,INFO,SAFETY,Emergency shutdown sequence complete
+2024-01-15T14:32:30Z,INFO,PLC-002,Pressure stabilizing: 180 PSI and decreasing
+2024-01-15T14:33:00Z,INFO,PLC-002,Pressure reading: 120 PSI - returning to safe range
+2024-01-15T14:34:00Z,INFO,AUTH,Session terminated: admin@192.168.1.105 - disconnect
+2024-01-15T14:35:00Z,INFO,PLC-001,System entering safe mode - awaiting operator intervention
+2024-01-15T14:35:15Z,INFO,PLC-002,System entering safe mode - manual restart required
+2024-01-15T14:40:00Z,INFO,HMI-MAIN,ALARM SUMMARY: 12 active alarms requiring acknowledgment
+2024-01-15T14:45:00Z,INFO,AUTH,Login attempt: emergency_response from console
