@@ -1,0 +1,62 @@
+timestamp,log_level,source,message
+2024-01-15T14:10:15,INFO,SCADA-HMI-01,User admin logged in from 192.168.1.100
+2024-01-15T14:10:45,INFO,PLC-REACTOR-01,Normal operation - Temperature: 85.2C Pressure: 120.5 PSI
+2024-01-15T14:11:20,INFO,SCADA-HMI-01,Viewing reactor control panel
+2024-01-15T14:12:05,INFO,PLC-REACTOR-01,Normal operation - Temperature: 85.4C Pressure: 120.8 PSI
+2024-01-15T14:13:12,WARN,FIREWALL-01,Port scan detected from 192.168.1.250
+2024-01-15T14:13:18,INFO,SCADA-HMI-01,User admin logged out
+2024-01-15T14:14:22,INFO,PLC-REACTOR-01,Normal operation - Temperature: 85.6C Pressure: 121.0 PSI
+2024-01-15T14:15:45,WARN,FIREWALL-01,Port scan detected from 192.168.1.250
+2024-01-15T14:16:10,ERROR,AUTH-SERVER,Failed login attempt for user 'engineer' from 192.168.1.250
+2024-01-15T14:16:15,ERROR,AUTH-SERVER,Failed login attempt for user 'operator' from 192.168.1.250
+2024-01-15T14:16:20,ERROR,AUTH-SERVER,Failed login attempt for user 'admin' from 192.168.1.250
+2024-01-15T14:16:25,ERROR,AUTH-SERVER,Failed login attempt for user 'root' from 192.168.1.250
+2024-01-15T14:16:30,ERROR,AUTH-SERVER,Failed login attempt for user 'supervisor' from 192.168.1.250
+2024-01-15T14:16:40,INFO,AUTH-SERVER,Successful login for user 'supervisor' from 192.168.1.250
+2024-01-15T14:17:05,INFO,SCADA-HMI-01,User supervisor logged in from 192.168.1.250
+2024-01-15T14:17:30,WARN,SCADA-HMI-01,Unusual access pattern detected for user supervisor
+2024-01-15T14:18:12,INFO,PLC-REACTOR-01,Normal operation - Temperature: 85.8C Pressure: 121.3 PSI
+2024-01-15T14:19:45,INFO,SCADA-HMI-01,User supervisor accessing PLC configuration panel
+2024-01-15T14:20:18,CRITICAL,PLC-REACTOR-01,Ladder logic program modification detected
+2024-01-15T14:20:25,WARN,SCADA-HMI-01,Configuration change: Alarm thresholds modified
+2024-01-15T14:20:40,ERROR,ALARM-SYSTEM,Temperature alarm disabled for PLC-REACTOR-01
+2024-01-15T14:20:45,ERROR,ALARM-SYSTEM,Pressure alarm disabled for PLC-REACTOR-01
+2024-01-15T14:21:10,CRITICAL,PLC-REACTOR-01,Safety interlock override command received
+2024-01-15T14:21:15,ERROR,SAFETY-SYSTEM,Safety interlock bypass activated on PLC-REACTOR-01
+2024-01-15T14:22:30,INFO,PLC-REACTOR-01,Setpoint change: Temperature target increased to 150.0C
+2024-01-15T14:22:35,INFO,PLC-REACTOR-01,Setpoint change: Pressure target increased to 180.0 PSI
+2024-01-15T14:23:05,INFO,PLC-REACTOR-01,Current status - Temperature: 90.2C Pressure: 125.5 PSI
+2024-01-15T14:24:10,WARN,PLC-REACTOR-01,Temperature rising rapidly - Current: 98.5C
+2024-01-15T14:25:15,ERROR,PLC-REACTOR-01,Temperature exceeds normal range - Current: 110.2C
+2024-01-15T14:26:20,CRITICAL,PLC-REACTOR-01,Temperature critical - Current: 125.8C Pressure: 145.2 PSI
+2024-01-15T14:27:05,INFO,SCADA-HMI-01,User supervisor viewing live reactor data
+2024-01-15T14:27:45,CRITICAL,PLC-REACTOR-01,Pressure critical - Current: 165.5 PSI
+2024-01-15T14:28:10,ERROR,PLC-REACTOR-01,Emergency cooling system activation failed
+2024-01-15T14:28:15,CRITICAL,SAFETY-SYSTEM,Emergency shutdown procedure blocked by interlock override
+2024-01-15T14:28:30,INFO,SCADA-HMI-01,User supervisor logged out
+2024-01-15T14:29:00,CRITICAL,PLC-REACTOR-01,CRITICAL CONDITION - Temperature: 148.5C Pressure: 178.2 PSI
+2024-01-15T14:29:15,ERROR,OPS-CONSOLE,Operator attempting manual emergency shutdown
+2024-01-15T14:29:20,ERROR,SAFETY-SYSTEM,Manual emergency shutdown failed - Interlock override active
+2024-01-15T14:30:05,CRITICAL,PLC-REACTOR-01,REACTOR FAILURE IMMINENT - Temperature: 152.0C Pressure: 182.0 PSI
+2024-01-15T14:30:30,INFO,OPS-CONSOLE,Emergency response team activated
+2024-01-15T14:31:00,INFO,SCADA-HMI-01,Security admin logged in from 192.168.1.100
+2024-01-15T14:31:15,WARN,SCADA-HMI-01,Unauthorized configuration changes detected
+2024-01-15T14:31:45,INFO,SAFETY-SYSTEM,Manual interlock override removal initiated
+2024-01-15T14:32:10,INFO,SAFETY-SYSTEM,Safety interlock restored
+2024-01-15T14:32:20,INFO,PLC-REACTOR-01,Emergency shutdown activated
+2024-01-15T14:32:50,WARN,PLC-REACTOR-01,Emergency cooling engaged - Temperature: 145.2C
+2024-01-15T14:33:30,INFO,PLC-REACTOR-01,Temperature declining - Current: 130.5C Pressure: 150.2 PSI
+2024-01-15T14:34:45,INFO,ALARM-SYSTEM,Temperature alarm re-enabled for PLC-REACTOR-01
+2024-01-15T14:34:50,INFO,ALARM-SYSTEM,Pressure alarm re-enabled for PLC-REACTOR-01
+2024-01-15T14:35:20,INFO,PLC-REACTOR-01,Temperature stabilizing - Current: 115.8C Pressure: 135.0 PSI
+2024-01-15T14:36:40,INFO,SEC-AUDIT,Investigating unauthorized access by user supervisor
+2024-01-15T14:37:15,WARN,SEC-AUDIT,User supervisor last login from suspicious IP 192.168.1.250
+2024-01-15T14:38:05,CRITICAL,SEC-AUDIT,Attack pattern identified: Brute force followed by malicious PLC programming
+2024-01-15T14:38:30,INFO,SEC-AUDIT,Attacker disabled safety alarms and overrode interlocks
+2024-01-15T14:39:00,ERROR,SEC-AUDIT,Modified ladder logic contained dangerous setpoint changes
+2024-01-15T14:40:15,INFO,INCIDENT-MGR,Incident classified as targeted SCADA attack
+2024-01-15T14:41:30,INFO,PLC-REACTOR-01,Normal operation restored - Temperature: 85.0C Pressure: 120.0 PSI
+2024-01-15T14:42:00,INFO,SCADA-HMI-01,User supervisor account disabled pending investigation
+2024-01-15T14:43:15,INFO,FIREWALL-01,IP 192.168.1.250 blocked on all interfaces
+2024-01-15T14:44:20,INFO,INCIDENT-MGR,Forensic analysis initiated
+2024-01-15T14:45:00,INFO,OPS-CONSOLE,System returned to normal operation under enhanced monitoring

@@ -1,0 +1,36 @@
+# Backend-specific .gitignore
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment (already handled by root .gitignore)
+# venv/
+# Include/
+# Lib/
+# Scripts/
+# share/
+# pyvenv.cfg
+
+# Local environment files
+.env.local
+.env.backend
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+logsentinel.db
+
+# Python logs
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak
