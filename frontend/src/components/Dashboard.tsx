@@ -3,7 +3,6 @@ import { Activity, AlertTriangle, Shield, TrendingUp, ChevronRight } from 'lucid
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { useApi } from '../hooks/useApi'
 import { LogFile, Anomaly } from '../types'
-import ConnectionTest from './ConnectionTest'
 
 interface DashboardProps {
   fileId: string | null
