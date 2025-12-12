@@ -59,7 +59,17 @@ export default function CopilotChat({ fileId, onProgressUpdate, onProgressVisibi
 
   const handleSend = async (query?: string) => {
     const messageText = query || input
-    if (!messageText.trim() || !fileId || loading) return
+    if (!messageText.trim() || loading) return
+    
+    // Check if a file is selected
+    if (!fileId) {
+      const errorMessage: CopilotMessage = {
+        role: 'assistant',
+        content: 'Please select a log file from the left panel before asking questions.'
+      }
+      setMessages(prev => [...prev, errorMessage])
+      return
+    }
 
     const userMessage: CopilotMessage = {
       role: 'user',
@@ -117,13 +127,25 @@ export default function CopilotChat({ fileId, onProgressUpdate, onProgressVisibi
         },
         (error) => {
           console.error('Copilot error:', error)
+          let errorContent = 'I encountered an error processing your request.'
+          
+          // Check for specific error messages
+          if (error.message && error.message.includes('still being processed')) {
+            errorContent = 'The selected file is still being processed. Please wait a moment and try again.'
+          } else if (error.message && error.message.includes('processing failed')) {
+            errorContent = 'File processing failed. Please try uploading the file again.'
+          } else if (error.message && error.message.includes('File not found')) {
+            errorContent = 'The selected file was not found. Please select another file.'
+          }
+          
           const errorMessage: CopilotMessage = {
             role: 'assistant',
-            content: 'I encountered an error processing your request. Please try again.'
+            content: errorContent
           }
           setMessages(prev => [...prev, errorMessage])
           setLoading(false)
           setCurrentAgent(null)
+          onProgressUpdate(null)
         }
       )
     } catch (error) {
@@ -135,6 +157,7 @@ export default function CopilotChat({ fileId, onProgressUpdate, onProgressVisibi
       setMessages(prev => [...prev, errorMessage])
       setLoading(false)
       setCurrentAgent(null)
+      onProgressUpdate(null)
     }
   }
 
