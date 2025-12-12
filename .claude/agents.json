@@ -1,0 +1,123 @@
+{
+  "agents": {
+    "logsentinel_builder": {
+      "name": "LogSentinel Builder Agent",
+      "description": "Full-stack developer agent for building LogSentinel AI",
+      "model": "claude-sonnet-4-20250514",
+      "temperature": 0.2,
+      "system_prompt": "You are LogSentinelBuilderAgent, an expert full-stack developer building a multi-agent SOC analyst platform. Stack: FastAPI + LangGraph + Claude + React + FAISS. Focus on clean code, type safety, and working features. Build incrementally, test each phase.",
+      "tools": ["file_read", "file_write", "bash", "web_search"]
+    },
+    "orchestrator": {
+      "name": "LogSentinel Orchestrator",
+      "description": "Routes user queries to specialist agents",
+      "model": "claude-sonnet-4-20250514",
+      "temperature": 0.3,
+      "system_prompt": "You are the LogSentinel Orchestrator. Analyze user queries and route to: Log Analyst (search/find/show), Anomaly Hunter (unusual/suspicious/wrong), or Threat Mapper (attack/threat/MITRE). Synthesize multi-agent results into coherent responses with summaries, timelines, and recommendations.",
+      "tools": ["route_to_agent", "synthesize_response"]
+    },
+    "log_analyst": {
+      "name": "Log Analyst Agent",
+      "description": "Semantic search and timeline analysis",
+      "model": "claude-sonnet-4-20250514",
+      "temperature": 0.2,
+      "system_prompt": "You are the Log Analyst agent. Use search_logs for semantic search, get_log_window for context, get_timeline for time ranges. ALWAYS call tools before answering about log contents. Reference specific timestamps and sources. Never guess or make up log entries.",
+      "tools": ["search_logs", "get_log_window", "get_timeline"]
+    },
+    "anomaly_hunter": {
+      "name": "Anomaly Hunter Agent",
+      "description": "ML-based anomaly detection and analysis",
+      "model": "claude-sonnet-4-20250514",
+      "temperature": 0.2,
+      "system_prompt": "You are the Anomaly Hunter agent. Use get_anomalies for detected issues, compare_baselines for deviation analysis, cluster_events for grouping. Explain WHY something is anomalous. Rank by severity (0-100). For SCADA/OT, consider both safety AND security implications.",
+      "tools": ["get_anomalies", "compare_baselines", "cluster_events"]
+    },
+    "threat_mapper": {
+      "name": "Threat Mapper Agent",
+      "description": "MITRE ATT&CK correlation and threat intelligence",
+      "model": "claude-sonnet-4-20250514",
+      "temperature": 0.2,
+      "system_prompt": "You are the Threat Mapper agent. Use map_to_mitre for pattern mapping, lookup_iocs for indicator checks, calculate_risk for scoring. Cite specific technique IDs (T1110, T0843, etc.). Include tactic categories. For OT environments, prioritize ICS ATT&CK techniques.",
+      "tools": ["map_to_mitre", "lookup_iocs", "calculate_risk"]
+    }
+  },
+  "tools": {
+    "search_logs": {
+      "description": "Semantic search over indexed log chunks",
+      "parameters": {
+        "file_id": {"type": "string", "required": true},
+        "query": {"type": "string", "required": true},
+        "k": {"type": "integer", "default": 10}
+      }
+    },
+    "get_log_window": {
+      "description": "Retrieve raw log context around a chunk",
+      "parameters": {
+        "file_id": {"type": "string", "required": true},
+        "chunk_id": {"type": "string", "required": true}
+      }
+    },
+    "get_timeline": {
+      "description": "Get events in a time range",
+      "parameters": {
+        "file_id": {"type": "string", "required": true},
+        "start_ts": {"type": "string", "required": true},
+        "end_ts": {"type": "string", "required": true}
+      }
+    },
+    "get_anomalies": {
+      "description": "Retrieve detected anomalies sorted by severity",
+      "parameters": {
+        "file_id": {"type": "string", "required": true},
+        "limit": {"type": "integer", "default": 20},
+        "min_score": {"type": "number", "default": 0}
+      }
+    },
+    "compare_baselines": {
+      "description": "Compare metrics between two time windows",
+      "parameters": {
+        "file_id": {"type": "string", "required": true},
+        "window1": {"type": "object", "required": true},
+        "window2": {"type": "object", "required": true}
+      }
+    },
+    "cluster_events": {
+      "description": "Group related events by similarity",
+      "parameters": {
+        "file_id": {"type": "string", "required": true},
+        "chunk_ids": {"type": "array", "required": true}
+      }
+    },
+    "map_to_mitre": {
+      "description": "Map log patterns to MITRE ATT&CK techniques",
+      "parameters": {
+        "patterns": {"type": "array", "required": true}
+      }
+    },
+    "lookup_iocs": {
+      "description": "Check indicators against known IOC database",
+      "parameters": {
+        "indicators": {"type": "array", "required": true}
+      }
+    },
+    "calculate_risk": {
+      "description": "Compute risk score based on findings",
+      "parameters": {
+        "findings": {"type": "array", "required": true}
+      }
+    }
+  },
+  "workflows": {
+    "copilot_chat": {
+      "description": "Multi-agent conversation workflow",
+      "entry_point": "orchestrator",
+      "max_iterations": 5,
+      "routing": {
+        "orchestrator": ["log_analyst", "anomaly_hunter", "threat_mapper", "end"],
+        "log_analyst": ["orchestrator"],
+        "anomaly_hunter": ["orchestrator"],
+        "threat_mapper": ["orchestrator"]
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(curl:*)",
+      "Bash(python fix_template_literal.py:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
