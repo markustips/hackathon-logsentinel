@@ -56,9 +56,17 @@ export default function Dashboard({ fileId }: DashboardProps) {
     try {
       const results = await api.searchLogs(fileId, searchQuery, 20)
       setSearchResults(results.results || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error('Search error:', error)
-      setSearchResults([])
+      
+      // Check if it's a 400 error (file not indexed)
+      if (error.response?.status === 400) {
+        setSearchResults([])
+        // Show error message in search results
+        alert('The selected file is still being processed or failed to index. Please wait or try re-uploading the file.')
+      } else {
+        setSearchResults([])
+      }
     } finally {
       setSearching(false)
     }
@@ -167,6 +175,43 @@ export default function Dashboard({ fileId }: DashboardProps) {
   return (
     <div className="h-full overflow-hidden bg-gray-900">
       <div className="h-full overflow-y-auto p-6 space-y-6">
+
+      {/* File Status Warning */}
+      {file && file.status !== 'indexed' && (
+        <div className={`border rounded-xl p-4 ${
+          file.status === 'processing' ? 'bg-yellow-900/20 border-yellow-600' :
+          file.status === 'failed' ? 'bg-red-900/20 border-red-600' :
+          'bg-gray-800 border-gray-700'
+        }`}>
+          <div className="flex items-start gap-3">
+            <AlertTriangle className={`w-5 h-5 mt-0.5 ${
+              file.status === 'processing' ? 'text-yellow-400' :
+              file.status === 'failed' ? 'text-red-400' :
+              'text-gray-400'
+            }`} />
+            <div className="flex-1">
+              <h3 className="font-semibold text-white mb-1">
+                {file.status === 'processing' ? 'File Processing' :
+                 file.status === 'failed' ? 'Processing Failed' :
+                 'File Status'}
+              </h3>
+              <p className="text-sm text-gray-300">
+                {file.status === 'processing' ? 
+                  'This file is still being processed and indexed. Search and AI features will be available once processing completes. This may take a few moments.' :
+                 file.status === 'failed' ?
+                  `Processing failed: ${file.error_message || 'Unknown error'}. Please delete this file and try uploading again.` :
+                  'File status is unknown.'}
+              </p>
+              {file.status === 'processing' && (
+                <div className="mt-2">
+                  <Activity className="w-4 h-4 animate-spin text-yellow-400 inline mr-2" />
+                  <span className="text-xs text-gray-400">Processing...</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search Bar */}
       <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
